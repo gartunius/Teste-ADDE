@@ -30,6 +30,8 @@ export class ClimateComponent implements OnInit {
             this.climateService.getWeatherInfoWithLatLon(latitude, longitude).toPromise().then(data => {
                 var jsonContent = data['data'][0];
                 this.setData(jsonContent);
+            }).catch(error => {
+                console.log("Erro no request HTTP");
             });
 
             this.climateService.getWeatherForecastWithLatLon(latitude, longitude).toPromise().then(data => {
