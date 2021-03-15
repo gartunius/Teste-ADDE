@@ -11,13 +11,9 @@ export class ClimateService {
 
   getClimateInfo(location: string) {
     let parameters = new HttpParams();
-
     parameters = parameters.set('location', location);
 
-    this.http.get(`http://localhost:5000/tst`, { params: parameters }).toPromise().then( data => {
-      console.log(data);
-    });
-
+    return this.http.get(`http://localhost:5000/weather`, { params: parameters });
   }
 
 }

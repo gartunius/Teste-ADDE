@@ -62,7 +62,7 @@ class ClimateService {
     getClimateInfo(location) {
         let parameters = new _angular_common_http__WEBPACK_IMPORTED_MODULE_0__["HttpParams"]();
         parameters = parameters.set('location', location);
-        this.http.get(`http://localhost:5000/tst`, { params: parameters }).toPromise().then(data => {
+        this.http.get(`http://localhost:5000/weather`, { params: parameters }).toPromise().then(data => {
             console.log(data);
         });
     }
@@ -154,7 +154,7 @@ class ClimateComponent {
         this.climateService = climateService;
     }
     ngOnInit() {
-        this.climateService.getClimateInfo('teste');
+        this.climateService.getClimateInfo('campinas');
     }
 }
 ClimateComponent.ɵfac = function ClimateComponent_Factory(t) { return new (t || ClimateComponent)(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_climate_service__WEBPACK_IMPORTED_MODULE_1__["ClimateService"])); };

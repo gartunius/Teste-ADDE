@@ -1,6 +1,19 @@
 <div class="climate">
-    <!-- <img> -->
-    <h1 class="location">Localização TESTE</h1>
-    <input id="location">
-    <button class="send_location">Send location</button>
+    <h1 class="container">Weather Check</h1>
+    <h2 class="container">{{ currentLocation }}</h2>
+
+    <div class="container">
+        <img class="weather_icon" src="https://www.weatherbit.io/static/img/icons/{{currentIcon}}.png" alt="">
+    </div>
+    <h2 class="property">Temperature: {{ currentTemp }} °C</h2>
+    <h2 class="property">Apparent Temperature: {{ currentAppTem }} °C</h2>
+    <h2 class="property">Precipitation Rate: {{ currentPrecip }} mm/hr</h2>
+    <h2 class="property">Snowfall: {{ currentSnow }} mm/hr</h2>
+    <h2 class="property">Weather: {{ currentWeatherDescription }}</h2>
+
+    <input id="location" [(ngModel)]="currentLocation" type="text">
+
+    <div class="container">
+        <button class="send_location" (click)="checkWeather()">Send location</button>
+    </div>
 </div>
