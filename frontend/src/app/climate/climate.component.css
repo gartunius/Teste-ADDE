@@ -1,0 +1,30 @@
+#location {
+  margin: 0 auto;
+  width: 300px;
+}
+
+.climate {
+  width: 500px;
+  margin: 0 auto;
+}
+
+.location {
+  margin: 0 auto;
+  color: #A80000;
+  size: 20px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: lighter;
+  line-height: 4rem;
+}
+
+.send_location {
+  margin: 0 auto;
+  width: 200px;
+  color: #2B2B2B;
+  background-color: #DDDDDD;
+  margin: 10px;
+  padding: 1rem;
+  border-radius: 4px;
+  font-size: 1rem;
+
+}
