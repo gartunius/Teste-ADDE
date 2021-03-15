@@ -8,23 +8,23 @@
 
     <table>
         <tr>
-            <td class="property">Temperature: </td>
+            <th class="property">Temperature: </th>
             <td class="property_value">{{ currentTemp }} °C</td>
         </tr>
         <tr>
-            <td class="property">Apparent Temperature: </td>
+            <th class="property">Apparent Temperature: </th>
             <td class="property_value">{{ currentAppTem }} °C</td>
         </tr>
         <tr>
-            <td class="property">Precipitation Rate: </td>
+            <th class="property">Precipitation Rate: </th>
             <td class="property_value">{{ currentPrecip }} mm/hr</td>
         </tr>
         <tr>
-            <td class="property">Snowfall: </td>
+            <th class="property">Snowfall: </th>
             <td class="property_value">{{ currentSnow }} mm/hr</td>
         </tr>
         <tr>
-            <td class="property">Weather: </td>
+            <th class="property">Weather: </th>
             <td class="property_value">{{ currentWeatherDescription }}</td>
         </tr>
     </table>
@@ -36,15 +36,15 @@
     </div>
         <table *ngFor="let day of days">
             <tr>
-                <td class="property">Day: </td>
+                <th class="property">Day: </th>
                 <td class="property_value">{{ day.date }}</td>
             </tr>
             <tr>
-                <td class="property">Temperature: </td>
+                <th class="property">Temperature: </th>
                 <td class="property_value">{{ day.temperature }} °C</td>
             </tr>
             <tr>
-                <td class="property">Weather: </td>
+                <th class="property">Weather: </th>
                 <td class="property_value">{{ day.weather }}</td>
             </tr>
         </table>
