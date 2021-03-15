@@ -1,19 +1,54 @@
 <div class="climate">
     <h1 class="container">Weather Check</h1>
-    <h2 class="container">{{ currentLocation }}</h2>
+    <h2 class="container">{{ currentLocation }} today</h2>
 
     <div class="container">
         <img class="weather_icon" src="https://www.weatherbit.io/static/img/icons/{{currentIcon}}.png" alt="">
     </div>
-    <h2 class="property">Temperature: {{ currentTemp }} °C</h2>
-    <h2 class="property">Apparent Temperature: {{ currentAppTem }} °C</h2>
-    <h2 class="property">Precipitation Rate: {{ currentPrecip }} mm/hr</h2>
-    <h2 class="property">Snowfall: {{ currentSnow }} mm/hr</h2>
-    <h2 class="property">Weather: {{ currentWeatherDescription }}</h2>
+
+    <table>
+        <tr>
+            <td class="property">Temperature: </td>
+            <td class="property_value">{{ currentTemp }} °C</td>
+        </tr>
+        <tr>
+            <td class="property">Apparent Temperature: </td>
+            <td class="property_value">{{ currentAppTem }} °C</td>
+        </tr>
+        <tr>
+            <td class="property">Precipitation Rate: </td>
+            <td class="property_value">{{ currentPrecip }} mm/hr</td>
+        </tr>
+        <tr>
+            <td class="property">Snowfall: </td>
+            <td class="property_value">{{ currentSnow }} mm/hr</td>
+        </tr>
+        <tr>
+            <td class="property">Weather: </td>
+            <td class="property_value">{{ currentWeatherDescription }}</td>
+        </tr>
+    </table>
 
     <input id="location" [(ngModel)]="currentLocation" type="text">
 
     <div class="container">
         <button class="send_location" (click)="checkWeather()">Send location</button>
     </div>
+        <table *ngFor="let day of days">
+            <tr>
+                <td class="property">Day: </td>
+                <td class="property_value">{{ day.date }}</td>
+            </tr>
+            <tr>
+                <td class="property">Temperature: </td>
+                <td class="property_value">{{ day.temperature }} °C</td>
+            </tr>
+            <tr>
+                <td class="property">Weather: </td>
+                <td class="property_value">{{ day.weather }}</td>
+            </tr>
+        </table>
+    <div>
+    </div>
+
 </div>
