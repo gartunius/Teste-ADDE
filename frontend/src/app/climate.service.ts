@@ -1,46 +1,35 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, Subject } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+    providedIn: 'root'
 })
 export class ClimateService {
-  private subject = new Subject<any>();
-  private days = '3';
 
-  constructor(private http: HttpClient) { }
+    constructor(private http: HttpClient) { }
 
-  getWeatherInfoWithLocation(location: string) {
-    let parameters = new HttpParams();
-    parameters = parameters.set('location', location);
+    // locationIdentifier has to be either the name of the city or it's coordenates.
+    getWeatherInfo(locationIdentifier: string, checkType:string, values:string[], days:string) {
+        let parameters = new HttpParams();
 
-    return this.http.get(`http://localhost:5000/weather`, { params: parameters });
-  }
+        parameters = parameters.set('locationID', locationIdentifier);
+        if ( locationIdentifier == "coords" ) {
+            parameters = parameters.set('latitude', values[0]);
+            parameters = parameters.set('longitude', values[1]);
 
-  getWeatherInfoWithLatLon(latitude: string, longitude: string) {
-    let parameters = new HttpParams();
-    parameters = parameters.set('latitude', latitude);
-    parameters = parameters.set('longitude', longitude);
+        } else if ( locationIdentifier == "location" ){
+            parameters = parameters.set('location', values[0]);
+        }
 
-    return this.http.get(`http://localhost:5000/weather`, { params: parameters });
-  }
+        if (checkType == "forecast") {
+            parameters = parameters.set('type', 'forecast');
+            parameters = parameters.set('days', days);
 
-  getWeatherForecastWithLocation(location: string) {
-    let parameters = new HttpParams();
-    parameters = parameters.set('location', location);
-    parameters = parameters.set('days', this.days);
+        } else {
+            parameters = parameters.set('type', 'current');
+        }
 
-    return this.http.get(`http://localhost:5000/weatherForecast`, { params: parameters });
-  }
-
-  getWeatherForecastWithLatLon(latitude: string, longitude: string) {
-    let parameters = new HttpParams();
-    parameters = parameters.set('latitude', latitude);
-    parameters = parameters.set('longitude', longitude);
-    parameters = parameters.set('days', this.days);
-
-    return this.http.get(`http://localhost:5000/weatherForecast`, { params: parameters });
-  }
+        return this.http.get(`http://localhost:5000/WeatherCheck`, { params: parameters });
+    }
 
 }

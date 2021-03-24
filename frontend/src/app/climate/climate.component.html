@@ -32,7 +32,7 @@
     <input id="location" [(ngModel)]="currentLocation" type="text">
 
     <div class="container">
-        <button class="send_location" (click)="checkWeather()">Send location</button>
+        <button class="send_location" (click)="checkWeather('location', null, null)">Send location</button>
     </div>
         <table *ngFor="let day of days">
             <tr>

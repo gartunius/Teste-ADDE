@@ -8,8 +8,6 @@ import { WeatherDay } from '../weather-day';
     styleUrls: ['./climate.component.css']
 })
 export class ClimateComponent implements OnInit {
-    private iconUrl = "https://www.weatherbit.io/static/img/icons/";
-
     currentLocation: string = 'campinas';
     currentTemp: string;
     currentAppTem: string;
@@ -27,50 +25,45 @@ export class ClimateComponent implements OnInit {
             var latitude = String(position.coords.latitude);
             var longitude = String(position.coords.longitude);
 
-            this.climateService.getWeatherInfoWithLatLon(latitude, longitude).toPromise().then(data => {
-                var jsonContent = data['data'][0];
-                this.setData(jsonContent);
-            }).catch(error => {
-                console.log("Erro no request HTTP");
-            });
-
-            this.climateService.getWeatherForecastWithLatLon(latitude, longitude).toPromise().then(data => {
-                var days: WeatherDay[] = [];
-
-                for (let key in data['data']) {
-                    var day = data['data'][key];
-
-                    var datetime = data['data'][key]['datetime'];
-                    var temperature = data['data'][key]['temp'];
-                    var weather = data['data'][key]['weather']['description'];
-
-                    days.push(<WeatherDay> {
-                        temperature: temperature,
-                        weather: weather,
-                        date: datetime,
-                    })
-                }
-
-                this.setDays(days);
-            })
+            this.checkWeather('coords', latitude, longitude);
         })
     }
 
-    checkWeather(): void {
-        this.climateService.getWeatherInfoWithLocation(this.currentLocation).toPromise().then(data => {
+    /*
+    * checkType = 'location' or 'coords'
+    * latitude = string formated value
+    * longitude = string formated value
+    * */
+    checkWeather(checkType:string, latitude:string, longitude:string): void {
+        var values = [];
+
+        if ( checkType == "location" ) {
+            values = [ this.currentLocation ];
+
+        } else if ( checkType == "coords" ) {
+            values = [ latitude, longitude ];
+
+        }
+
+        this.climateService.getWeatherInfo(checkType, "current", values, null).toPromise().then(data => {
             var jsonContent = data['data'][0];
-            this.setData(jsonContent);
+
+            this.currentLocation           = jsonContent['city_name'];
+            this.currentTemp               = jsonContent['temp'];
+            this.currentAppTem             = jsonContent['app_temp'];
+            this.currentPrecip             = jsonContent['precip'];
+            this.currentSnow               = jsonContent['snow'];
+            this.currentWeatherDescription = jsonContent['weather']['description'];
+            this.currentIcon               = jsonContent['weather']['icon'];
         });
 
-        this.climateService.getWeatherForecastWithLocation(this.currentLocation).toPromise().then(data => {
+        this.climateService.getWeatherInfo(checkType, "forecast", values, "3").toPromise().then(data => {
             var days: WeatherDay[] = [];
 
             for (let key in data['data']) {
-                var day = data['data'][key];
-
-                var datetime = data['data'][key]['datetime'];
+                var datetime    = data['data'][key]['datetime'];
                 var temperature = data['data'][key]['temp'];
-                var weather = data['data'][key]['weather']['description'];
+                var weather     = data['data'][key]['weather']['description'];
 
                 days.push(<WeatherDay> {
                     temperature: temperature,
@@ -79,22 +72,10 @@ export class ClimateComponent implements OnInit {
                 })
             }
 
-            this.setDays(days);
+            this.days = days;
         })
-    }
-
-    private setData(jsonContent): void {
-        this.currentLocation = String(jsonContent['city_name'])
-        this.currentTemp = String(jsonContent['temp'])
-        this.currentAppTem = String(jsonContent['app_temp'])
-        this.currentPrecip = String(jsonContent['precip'])
-        this.currentSnow = String(jsonContent['snow'])
-        this.currentWeatherDescription = String(jsonContent['weather']['description'])
-        this.currentIcon = String(jsonContent['weather']['icon'])
-    }
-
-    private setDays(days): void {
-        this.days = days;
+        
     }
 
 }
+

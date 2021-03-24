@@ -51,45 +51,37 @@ const environment = {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ClimateService", function() { return ClimateService; });
 /* harmony import */ var _angular_common_http__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @angular/common/http */ "tk/3");
-/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! rxjs */ "qCKp");
-/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @angular/core */ "fXoL");
-
+/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/core */ "fXoL");
 
 
 
 class ClimateService {
     constructor(http) {
         this.http = http;
-        this.subject = new rxjs__WEBPACK_IMPORTED_MODULE_1__["Subject"]();
-        this.days = '3';
     }
-    getWeatherInfoWithLocation(location) {
+    // locationIdentifier has to be either the name of the city or it's coordenates.
+    getWeatherInfo(locationIdentifier, checkType, values, days) {
         let parameters = new _angular_common_http__WEBPACK_IMPORTED_MODULE_0__["HttpParams"]();
-        parameters = parameters.set('location', location);
-        return this.http.get(`http://localhost:5000/weather`, { params: parameters });
-    }
-    getWeatherInfoWithLatLon(latitude, longitude) {
-        let parameters = new _angular_common_http__WEBPACK_IMPORTED_MODULE_0__["HttpParams"]();
-        parameters = parameters.set('latitude', latitude);
-        parameters = parameters.set('longitude', longitude);
-        return this.http.get(`http://localhost:5000/weather`, { params: parameters });
-    }
-    getWeatherForecastWithLocation(location) {
-        let parameters = new _angular_common_http__WEBPACK_IMPORTED_MODULE_0__["HttpParams"]();
-        parameters = parameters.set('location', location);
-        parameters = parameters.set('days', this.days);
-        return this.http.get(`http://localhost:5000/weatherForecast`, { params: parameters });
-    }
-    getWeatherForecastWithLatLon(latitude, longitude) {
-        let parameters = new _angular_common_http__WEBPACK_IMPORTED_MODULE_0__["HttpParams"]();
-        parameters = parameters.set('latitude', latitude);
-        parameters = parameters.set('longitude', longitude);
-        parameters = parameters.set('days', this.days);
-        return this.http.get(`http://localhost:5000/weatherForecast`, { params: parameters });
+        parameters = parameters.set('locationID', locationIdentifier);
+        if (locationIdentifier == "coords") {
+            parameters = parameters.set('latitude', values[0]);
+            parameters = parameters.set('longitude', values[1]);
+        }
+        else if (locationIdentifier == "location") {
+            parameters = parameters.set('location', values[0]);
+        }
+        if (checkType == "forecast") {
+            parameters = parameters.set('type', 'forecast');
+            parameters = parameters.set('days', days);
+        }
+        else {
+            parameters = parameters.set('type', 'current');
+        }
+        return this.http.get(`http://localhost:5000/WeatherCheck`, { params: parameters });
     }
 }
-ClimateService.ɵfac = function ClimateService_Factory(t) { return new (t || ClimateService)(_angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵinject"](_angular_common_http__WEBPACK_IMPORTED_MODULE_0__["HttpClient"])); };
-ClimateService.ɵprov = _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵdefineInjectable"]({ token: ClimateService, factory: ClimateService.ɵfac, providedIn: 'root' });
+ClimateService.ɵfac = function ClimateService_Factory(t) { return new (t || ClimateService)(_angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵinject"](_angular_common_http__WEBPACK_IMPORTED_MODULE_0__["HttpClient"])); };
+ClimateService.ɵprov = _angular_core__WEBPACK_IMPORTED_MODULE_1__["ɵɵdefineInjectable"]({ token: ClimateService, factory: ClimateService.ɵfac, providedIn: 'root' });
 
 
 /***/ }),
@@ -217,43 +209,41 @@ function ClimateComponent_table_37_Template(rf, ctx) { if (rf & 1) {
 class ClimateComponent {
     constructor(climateService) {
         this.climateService = climateService;
-        this.iconUrl = "https://www.weatherbit.io/static/img/icons/";
         this.currentLocation = 'campinas';
     }
     ngOnInit() {
         navigator.geolocation.getCurrentPosition((position) => {
             var latitude = String(position.coords.latitude);
             var longitude = String(position.coords.longitude);
-            this.climateService.getWeatherInfoWithLatLon(latitude, longitude).toPromise().then(data => {
-                var jsonContent = data['data'][0];
-                this.setData(jsonContent);
-            });
-            this.climateService.getWeatherForecastWithLatLon(latitude, longitude).toPromise().then(data => {
-                var days = [];
-                for (let key in data['data']) {
-                    var day = data['data'][key];
-                    var datetime = data['data'][key]['datetime'];
-                    var temperature = data['data'][key]['temp'];
-                    var weather = data['data'][key]['weather']['description'];
-                    days.push({
-                        temperature: temperature,
-                        weather: weather,
-                        date: datetime,
-                    });
-                }
-                this.setDays(days);
-            });
+            this.checkWeather('coords', latitude, longitude);
         });
     }
-    checkWeather() {
-        this.climateService.getWeatherInfoWithLocation(this.currentLocation).toPromise().then(data => {
+    /*
+    * checkType = 'location' or 'coords'
+    * latitude = string formated value
+    * longitude = string formated value
+    * */
+    checkWeather(checkType, latitude, longitude) {
+        var values = [];
+        if (checkType == "location") {
+            values = [this.currentLocation];
+        }
+        else if (checkType == "coords") {
+            values = [latitude, longitude];
+        }
+        this.climateService.getWeatherInfo(checkType, "current", values, null).toPromise().then(data => {
             var jsonContent = data['data'][0];
-            this.setData(jsonContent);
+            this.currentLocation = jsonContent['city_name'];
+            this.currentTemp = jsonContent['temp'];
+            this.currentAppTem = jsonContent['app_temp'];
+            this.currentPrecip = jsonContent['precip'];
+            this.currentSnow = jsonContent['snow'];
+            this.currentWeatherDescription = jsonContent['weather']['description'];
+            this.currentIcon = jsonContent['weather']['icon'];
         });
-        this.climateService.getWeatherForecastWithLocation(this.currentLocation).toPromise().then(data => {
+        this.climateService.getWeatherInfo(checkType, "forecast", values, this.amountOfDays).toPromise().then(data => {
             var days = [];
             for (let key in data['data']) {
-                var day = data['data'][key];
                 var datetime = data['data'][key]['datetime'];
                 var temperature = data['data'][key]['temp'];
                 var weather = data['data'][key]['weather']['description'];
@@ -263,20 +253,8 @@ class ClimateComponent {
                     date: datetime,
                 });
             }
-            this.setDays(days);
+            this.days = days;
         });
-    }
-    setData(jsonContent) {
-        this.currentLocation = String(jsonContent['city_name']);
-        this.currentTemp = String(jsonContent['temp']);
-        this.currentAppTem = String(jsonContent['app_temp']);
-        this.currentPrecip = String(jsonContent['precip']);
-        this.currentSnow = String(jsonContent['snow']);
-        this.currentWeatherDescription = String(jsonContent['weather']['description']);
-        this.currentIcon = String(jsonContent['weather']['icon']);
-    }
-    setDays(days) {
-        this.days = days;
     }
 }
 ClimateComponent.ɵfac = function ClimateComponent_Factory(t) { return new (t || ClimateComponent)(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_climate_service__WEBPACK_IMPORTED_MODULE_1__["ClimateService"])); };
@@ -338,7 +316,7 @@ ClimateComponent.ɵcmp = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineC
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](34, "div", 1);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](35, "button", 6);
-        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵlistener"]("click", function ClimateComponent_Template_button_click_35_listener() { return ctx.checkWeather(); });
+        _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵlistener"]("click", function ClimateComponent_Template_button_click_35_listener() { return ctx.checkWeather("location", null, null); });
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵtext"](36, "Send location");
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementEnd"]();
